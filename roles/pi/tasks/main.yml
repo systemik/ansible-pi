@@ -1,12 +1,41 @@
 ---
+
+  gather_facts: yes
+  update_cache: yes
+  packages_to_install: [ git, automake, build-essential, libtool, libx11-dev, xinput, autoconf, libx11-dev, libxi-dev, x11proto-input-dev, python-pyaudio, python3-pyaudio, swig, sox]
+  pip_packages_to_install: [ pyaudio ]
+  npm_packages_to_install: [  ]
+
+
 - name: 'Configure WIFI'
   copy: src=./wpa_supplicant.conf dest=/etc/wpa_supplicant/wpa_supplicant.conf mode=0600
+  notify: reboot
 
 - name: 'Update APT package cache'
   action: apt update_cache=yes
 
 - name: 'Upgrade APT to the lastest packages'
   action: apt upgrade=safe
+
+- name: install packages
+  apt: pkg={{ item }} state=installed update_cache={{ update_cache }}
+  with_items: "{{packages_to_install}}"
+
+#- name: install python modules with pip
+ # pip: name={{ item }}
+ # with_items: pip_packages_to_install
+
+#- name: install node.js packages with npm
+ # npm: name={{ item }} global=yes
+ # with_items: npm_packages_to_install
+
+    # Example git checkout from Ansible Playbooks
+
+- name: 'clone git'
+  git: repo=https://github.com/systemik/ansible-pi.git dest=/home/pi/ansible-pi
+
+- name: 'clone git 2'
+  git: repo=https://github.com/systemik/AlexaPi.git dest=/home/pi/AlexaPi
 
 - name: 'Reboot'
   command: sleep 2 && reboot
@@ -17,3 +46,4 @@
 - name: "Wait for Raspberry PI to come back"
   local_action: wait_for host={{ ansible_ssh_host }} port=22 state=started delay=10
   become: false
+

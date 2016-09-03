@@ -12,6 +12,18 @@
   tasks:
   - name: 'Configure WIFI'
     template: src=./wpa_supplicant.conf dest=/etc/wpa_supplicant/wpa_supplicant.conf mode=0600
+
+  - name: 'Configure LCD'
+    template: src={{item.src}} dest={{item.dest}}
+    with_items:
+      - { src: './config-files-template/boot/config.txt', dest: '/boot/config.txt' }
+      - { src: './config-files-template/boot/cmdline.txt', dest: '/boot/cmdline.txt' }
+      - { src: './config-files-template/boot/overlays/waveshare32b-overlay.dtb', dest: '/boot/overlays/waveshare32b-overlay.dtb' }
+      - { src: './config-files-template/boot/overlays/waveshare32b.dtbo', dest: '/boot/overlays/waveshare32b.dtbo' }
+      #- { src: './config-files-template/boot/config.txt', dest: '' }
+      #- { src: './config-files-template/boot/config.txt', dest: '' }
+   #backup: yes
+
 #    notify: reboot
 
   - name: 'Update APT package cache'
